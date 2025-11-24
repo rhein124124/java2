@@ -8,9 +8,9 @@ import java.util.Random;
 
 public class PlayerAIModel extends PlayerModel {
 
-    private int time = 40; // The number of steps before a random turn
-    private List<PlayerModel> allPlayers; // List of all players including itself
-    private Random rand = new Random();
+    protected int time = 40; // The number of steps before a random turn
+    protected List<PlayerModel> allPlayers; // List of all players including itself
+    protected Random rand = new Random();
 
     public PlayerAIModel(int x, int y, int velocityX, int velocityY, int width, int height, TronColor color) {
         super(x, y, velocityX, velocityY, width, height, color);
@@ -22,7 +22,7 @@ public class PlayerAIModel extends PlayerModel {
     }
 
     // Original reactProximity logic, adapted for Model
-    private void reactProximity() {
+    protected void reactProximity() {
         int velocity = Math.max(Math.abs(velocityX), Math.abs(velocityY));
         if (velocity == 0) velocity = startVel; // Ensure velocity is not zero
 
@@ -110,7 +110,7 @@ public class PlayerAIModel extends PlayerModel {
     }
 
     // Helper to check for collision risk in a given direction
-    private boolean detectCollisionRisk(int checkX, int checkY, int lookAheadDistance) {
+    protected boolean detectCollisionRisk(int checkX, int checkY, int lookAheadDistance) {
         // Check for wall collision
         if (checkX < 0 || checkX > rightBound || checkY < 0 || checkY > bottomBound) {
             return true;
@@ -140,5 +140,39 @@ public class PlayerAIModel extends PlayerModel {
             }
         }
         return false;
+    }
+
+    @Override
+    public void setDirection(Direction direction) {
+        // AI's direction setting logic
+        int currentVel = Math.max(Math.abs(velocityX), Math.abs(velocityY));
+        if (currentVel == 0) currentVel = startVel; // If not moving, assume startVel
+
+        switch (direction) {
+            case UP:
+                if (this.velocityY == 0) { // Only change if not moving vertically
+                    this.velocityX = 0;
+                    this.velocityY = -currentVel;
+                }
+                break;
+            case DOWN:
+                if (this.velocityY == 0) {
+                    this.velocityX = 0;
+                    this.velocityY = currentVel;
+                }
+                break;
+            case LEFT:
+                if (this.velocityX == 0) { // Only change if not moving horizontally
+                    this.velocityX = -currentVel;
+                    this.velocityY = 0;
+                }
+                break;
+            case RIGHT:
+                if (this.velocityX == 0) {
+                    this.velocityX = currentVel;
+                    this.velocityY = 0;
+                }
+                break;
+        }
     }
 }
