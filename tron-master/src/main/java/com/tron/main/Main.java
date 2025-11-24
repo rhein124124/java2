@@ -47,19 +47,7 @@ public class Main extends Application {
         // For now, let's push a dummy state until MenuState is created.
         // gsm.push(new MenuState(gsm)); 
         // Will be replaced with MenuState once it's available.
-        gsm.push(new GameState() { // Dummy initial state
-            @Override
-            public void init() {}
-            @Override
-            public void handleInput() {}
-            @Override
-            public void update(double dt) {}
-            @Override
-            public void render(GraphicsContext gc) {
-                gc.clearRect(0,0, WINDOW_WIDTH, WINDOW_HEIGHT);
-                gc.fillText("Loading...", WINDOW_WIDTH/2 - 30, WINDOW_HEIGHT/2);
-            }
-        });
+        gsm.push(new MenuState(gsm));
         
         lastTime = System.nanoTime();
         

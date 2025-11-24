@@ -1,0 +1,152 @@
+package com.tron.gamestate;
+
+import com.tron.main.Main;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MenuState implements GameState {
+
+    private GameStateManager gsm;
+    private Image mainMenuImage;
+    private Image playMenuImage;
+    private Image instructionsPageImage;
+
+    private List<Image> mainMenuItems;
+    private List<Image> playMenuItems;
+
+    private boolean showPlayMenu = false;
+    private boolean showInstructions = false;
+
+    private int selectedMainMenuOption = 0; // 0: Play, 1: Instructions, 2: Quit
+    private int selectedPlayMenuOption = 0; // 0: Story, 1: Survival, 2: Two Player
+
+    public MenuState(GameStateManager gsm) {
+        this.gsm = gsm;
+        loadImages();
+    }
+
+    private void loadImages() {
+        try {
+            mainMenuImage = new Image(getClass().getResourceAsStream("/tron0_0.jpg"));
+            playMenuImage = new Image(getClass().getResourceAsStream("/play_menu.jpg"));
+            instructionsPageImage = new Image(getClass().getResourceAsStream("/instructions_page.png"));
+
+            mainMenuItems = new ArrayList<>();
+            mainMenuItems.add(new Image(getClass().getResourceAsStream("/play_before.png")));
+            mainMenuItems.add(new Image(getClass().getResourceAsStream("/instructions_before.png")));
+            mainMenuItems.add(new Image(getClass().getResourceAsStream("/quit_before.png")));
+
+            playMenuItems = new ArrayList<>();
+            playMenuItems.add(new Image(getClass().getResourceAsStream("/story.png")));
+            playMenuItems.add(new Image(getClass().getResourceAsStream("/survival.png")));
+            playMenuItems.add(new Image(getClass().getResourceAsStream("/two_player.png")));
+
+        } catch (Exception e) {
+            System.err.println("Error loading menu images: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void init() {
+    }
+
+    @Override
+    public void handleInput() {
+        Main.getScene().setOnKeyPressed(event -> {
+            if (showPlayMenu) {
+                handlePlayMenuInput(event);
+            } else if (showInstructions) {
+                handleInstructionsInput(event);
+            } else {
+                handleMainMenuInput(event);
+            }
+        });
+    }
+
+    private void handleMainMenuInput(KeyEvent event) {
+        if (event.getCode() == KeyCode.UP) {
+            selectedMainMenuOption = (selectedMainMenuOption - 1 + mainMenuItems.size()) % mainMenuItems.size();
+        } else if (event.getCode() == KeyCode.DOWN) {
+            selectedMainMenuOption = (selectedMainMenuOption + 1) % mainMenuItems.size();
+        } else if (event.getCode() == KeyCode.ENTER) {
+            if (selectedMainMenuOption == 0) {
+                showPlayMenu = true;
+                showInstructions = false;
+            } else if (selectedMainMenuOption == 1) {
+                showInstructions = true;
+                showPlayMenu = false;
+            } else if (selectedMainMenuOption == 2) {
+                System.exit(0);
+            }
+        }
+    }
+
+    private void handlePlayMenuInput(KeyEvent event) {
+        if (event.getCode() == KeyCode.UP) {
+            selectedPlayMenuOption = (selectedPlayMenuOption - 1 + playMenuItems.size()) % playMenuItems.size();
+        } else if (event.getCode() == KeyCode.DOWN) {
+            selectedPlayMenuOption = (selectedPlayMenuOption + 1) % playMenuItems.size();
+        } else if (event.getCode() == KeyCode.ENTER) {
+            if (selectedPlayMenuOption == 0) {
+                gsm.setState(new PlayingState(gsm, 3));
+            } else if (selectedPlayMenuOption == 1) {
+                gsm.setState(new PlayingState(gsm, 1));
+            } else if (selectedPlayMenuOption == 2) {
+                gsm.setState(new PlayingState(gsm, 2));
+            }
+        } else if (event.getCode() == KeyCode.ESCAPE) {
+            showPlayMenu = false;
+        }
+    }
+
+    private void handleInstructionsInput(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            showInstructions = false;
+        }
+    }
+
+    @Override
+    public void update(double dt) {
+    }
+
+    @Override
+    public void render(GraphicsContext gc) {
+        gc.clearRect(0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
+        if (showInstructions) {
+            if (instructionsPageImage != null) {
+                gc.drawImage(instructionsPageImage, 0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
+            }
+        } else if (showPlayMenu) {
+            if (playMenuImage != null) {
+                gc.drawImage(playMenuImage, 0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
+            }
+            renderMenuItems(gc, playMenuItems, selectedPlayMenuOption, Main.WINDOW_HEIGHT / 2.0);
+        } else {
+            if (mainMenuImage != null) {
+                gc.drawImage(mainMenuImage, 0, 0, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
+            }
+            renderMenuItems(gc, mainMenuItems, selectedMainMenuOption, Main.WINDOW_HEIGHT / 2.0);
+        }
+    }
+
+    private void renderMenuItems(GraphicsContext gc, List<Image> items, int selectedOption, double startY) {
+        double currentY = startY;
+        for (int i = 0; i < items.size(); i++) {
+            Image item = items.get(i);
+            double x = (Main.WINDOW_WIDTH - item.getWidth()) / 2;
+            if (i == selectedOption) {
+                gc.setGlobalAlpha(0.7);
+            } else {
+                gc.setGlobalAlpha(1.0);
+            }
+            gc.drawImage(item, x, currentY);
+            currentY += item.getHeight() + 10;
+            gc.setGlobalAlpha(1.0);
+        }
+    }
+}
