@@ -48,6 +48,11 @@
     <build>
         <sourceDirectory>tron-master/src/main/java</sourceDirectory>
         <testSourceDirectory>tron-master/src/test/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>tron-master/src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
