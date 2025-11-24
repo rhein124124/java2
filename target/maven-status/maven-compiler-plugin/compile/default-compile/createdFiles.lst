@@ -1,6 +1,6 @@
 com/tron/gamestate/GameStateManager.class
 com/tron/gamestate/GameState.class
-com/tron/main/Main$1.class
 com/tron/gamestate/MenuState.class
-com/tron/gamestate/PlayingState.class
 com/tron/main/Main.class
+com/tron/main/Main$1.class
+com/tron/gamestate/PlayingState.class
