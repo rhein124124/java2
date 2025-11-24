@@ -2,6 +2,7 @@ package com.tron.main;
 
 import com.tron.gamestate.GameState;
 import com.tron.gamestate.GameStateManager;
+import com.tron.gamestate.MenuState;
 //import com.tron.gamestate.MenuState; // Will create MenuState later
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
